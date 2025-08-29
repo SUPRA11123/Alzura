@@ -30,6 +30,3 @@ import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 const sqs = new SQSClient({ region: 'eu-central-1' });
 await sqs.send(new SendMessageCommand({ QueueUrl: process.env.SQS_URL, MessageBody: JSON.stringify(payload) }));
 ```
-
-## CV one-liner
-Self-learning demo: Dockerized **Node.js/Express** microservice with **MySQL** and **RabbitMQ** events + **Vue 3** SPA with auth-less CRUD, mirroring ALZURA’s Node/Express, Vue, MySQL, Docker, messaging stack.
