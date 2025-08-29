@@ -1,0 +1,49 @@
+
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: autengo_demo
+    ports: ["3306:3306"]
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-ppassword"]
+      interval: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports: ["5672:5672","15672:15672"]
+    healthcheck:
+      test: ["CMD","rabbitmq-diagnostics","ping"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./api
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: autengo_demo
+      AMQP_URL: amqp://rabbitmq:5672
+      PORT: 3000
+    ports: ["3000:3000"]
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    environment:
+      VITE_API_BASE: http://api:3000
+    ports: ["5173:5173"]
+    depends_on:
+      - api
+
+volumes:
+  dbdata:
